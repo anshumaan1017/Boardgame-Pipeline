@@ -144,12 +144,6 @@ pipeline {
             }
         }
         
-        stage('Secret Scanning with TruffleHog') {
-            steps {
-                sh "trufflehog git --json --output trufflehog-report.json https://github.com/anshumaan-10/Boardgame-Pipeline.git"
-                sh "cat trufflehog-report.json | jq '.' > trufflehog-report.html"
-            }
-        }
     }
     
     post {
@@ -181,7 +175,7 @@ pipeline {
                     from: 'jenkins@example.com',
                     replyTo: 'jenkins@example.com',
                     mimeType: 'text/html',
-                    attachmentsPattern: 'trivy-fs-report.html, trivy-image-report.html, **/dependency-check-report.xml, dastardly-report.xml, trufflehog-report.html'
+                    attachmentsPattern: 'trivy-fs-report.html, trivy-image-report.html, **/dependency-check-report.xml, dastardly-report.xml'
                 )
             }
             // Publish JUnit report; this is not dependent on the success of the previous stages
