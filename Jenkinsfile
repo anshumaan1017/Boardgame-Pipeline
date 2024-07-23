@@ -7,7 +7,7 @@ pipeline {
         maven 'maven3'
     }
 
-    enviornment {
+    environment {
         SCANNER_HOME= tool 'sonar-scanner'
     }
 
@@ -52,7 +52,12 @@ pipeline {
                 }
             }
         }
-        
+        stage('OWASP Dependency Check') {
+            steps {
+                dependencyCheck additionalArguments: '--scan ./', odcInstallation: 'DC'
+                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+            }
+        }
         stage('Build') {
             steps {
                sh "mvn package"
@@ -70,7 +75,7 @@ pipeline {
         stage('Build & Tag Docker Image') {
             steps {
                script {
-                   withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                   docker.withRegistry('', 'docker-cred')  {
                             sh "docker build -t anshumaan10/boardshack:latest ."
                     }
                }
@@ -86,7 +91,7 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                script {
-                   withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                   docker.withRegistry('', 'docker-cred')  {
                             sh "docker push anshumaan10/boardshack:latest"
                     }
                }
@@ -108,6 +113,38 @@ pipeline {
                 }
             }
         }
+        
+               stage("Docker Pull Dastardly from Burp Suite container image") {
+            steps {
+                sh 'docker pull public.ecr.aws/portswigger/dastardly:latest'
+            }
+        }
+        stage("Docker run Dastardly from Burp Suite Scan") {
+            steps {
+                cleanWs()
+                sh '''
+                    docker run --user $(id -u) -v ${WORKSPACE}:${WORKSPACE}:rw \
+                    -e BURP_START_URL=http://34.133.95.249:32567 \
+                    -e BURP_REPORT_FILE_PATH=${WORKSPACE}/dastardly-report.xml \
+                    -e BURP_USER=admin \
+                    -e BURP_PASS=admin \
+                    public.ecr.aws/portswigger/dastardly:latest || true
+                '''
+            }
+        }
+        stage("Additional URL") {
+            steps {
+                sh 'curl -X GET http://34.133.95.249:32567/login || true'
+            }
+        }
+    }
+    post {
+        always {
+            // Publish JUnit report; this is not dependent on the success of the previous stages
+            junit testResults: 'dastardly-report.xml', skipPublishingChecks: true
+        }
+    }
+}
         
         
     }
