@@ -68,6 +68,7 @@ This web application displays lists of board games and their reviews. While anyo
 ![image](https://github.com/user-attachments/assets/43c05e10-71b4-4ef0-baa2-9a6549de4a9f)
 ![image](https://github.com/user-attachments/assets/6e2dd41e-0730-447f-ad8b-119d1fb73d5e)
 ![image](https://github.com/user-attachments/assets/442c3502-fe69-42d3-94b4-bd066ac82a19)
+![image](https://github.com/user-attachments/assets/9afa6ace-5cd4-425a-a39b-2ce7833d50e1)
 ![image](https://github.com/user-attachments/assets/d951579b-f6be-42db-8703-3f0b5ce8bcd3)
 ![image](https://github.com/user-attachments/assets/7dc83fab-909d-4a30-a122-29399660de3e)
 ![image](https://github.com/user-attachments/assets/896196ac-7117-4202-9f75-befd68b922a0)
