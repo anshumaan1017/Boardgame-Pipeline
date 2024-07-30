@@ -127,7 +127,7 @@ jobs:
       security-events: write
     steps:
     - name: Build Docker Image
-      run: docker build -t anshumaan10/board:latest .
+      run: docker build -t anshumaan10/board:v1.0 .
 
   # Job to perform Trivy image scan
   trivy-image-scan:
@@ -142,7 +142,7 @@ jobs:
     steps:
     - name: Trivy Image Scan
       run: |
-        trivy image --format table -o trivy-image-report.html anshumaan10/board:latest
+        trivy image --format table -o trivy-image-report.html anshumaan10/board:v1.0
     
     - name: Upload Trivy Image Scan report
       uses: actions/upload-artifact@v4
@@ -179,7 +179,10 @@ jobs:
       security-events: write
     steps:
     - name: Push Docker Image
-      run: docker push anshumaan10/board:latest
+      run: |
+        docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_TOKEN
+        docker push anshumaan10/board:v1.0
+
 
   # Job to apply Kubernetes manifests
   kubectl-apply:
