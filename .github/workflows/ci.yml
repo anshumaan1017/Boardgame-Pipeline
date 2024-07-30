@@ -84,7 +84,7 @@ jobs:
 
 
   Build-Tag-Push-Scan:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: Secret-Scanning
     steps:
       - name: Checkout repository
@@ -148,6 +148,16 @@ jobs:
         with:
           name: snyk-reports
           path: snyk-reports
+
+      - name: Trivy FS Scan
+        run: |
+          trivy fs --format table -o trivy-fs-report.html .
+    
+      - name: Upload Trivy FS Scan report
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-fs-report
+          path: trivy-fs-report.html
 
   kubernetes-deploy:
     runs-on: ubuntu-latest
