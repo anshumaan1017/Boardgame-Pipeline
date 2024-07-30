@@ -89,10 +89,9 @@ jobs:
     runs-on: self-hosted
     needs: Secret-Scanning
     steps:
-
       - name: Remove target directory with sudo
         run: sudo rm -rf /home/anshumaansingh10jan/actions-runner/_work/Boardgame-Pipeline/Boardgame-Pipeline/target
-        
+
       - name: Checkout repository
         uses: actions/checkout@v3
 
@@ -139,8 +138,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Give execute permission to mvnw
-        run: chmod +x mvnw
+      - name: Install Maven
+        run: sudo apt-get install -y maven
 
       - name: Run Snyk to check for vulnerabilities
         uses: snyk/actions/maven@master
