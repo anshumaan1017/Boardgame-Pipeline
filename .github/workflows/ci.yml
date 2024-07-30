@@ -19,10 +19,6 @@ jobs:
           WORKSPACE: https://github.com/${{ github.repository }}/blob/${{ github.sha }}
           GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
 
-      - name: Create dummy ShiftLeft SAST report
-        if: always()
-        run: echo "No issues found" > reports/shiftleft/shiftleft-dummy-report.txt
-
       - name: Upload ShiftLeft SAST reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -34,10 +30,6 @@ jobs:
         uses: ajinabraham/njsscan-action@master
         with:
           args: '.'
-
-      - name: Create dummy njsscan report
-        if: always()
-        run: echo "No issues found" > reports/njsscan/njsscan-dummy-report.txt
 
       - name: Upload njsscan reports
         if: always()
@@ -85,10 +77,6 @@ jobs:
           GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }} # Only required for Organizations, not personal accounts.
         continue-on-error: true
   
-      - name: Create dummy Secret Scanning report
-        if: always()
-        run: echo "No secrets found" > secret-scanning-reports/secret-scanning-dummy-report.txt
-
       - name: Upload Secret Scanning reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -140,7 +128,7 @@ jobs:
           path: trivy-image-report.html
 
   Software-Composition-Analysis-SCA:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: Build-Tag-Push-Scan
     steps:
       - name: Checkout repository
@@ -151,10 +139,6 @@ jobs:
         continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-
-      - name: Create dummy Snyk report
-        if: always()
-        run: echo "No vulnerabilities found" > snyk-reports/snyk-dummy-report.txt
 
       - name: Upload Snyk reports
         if: always()
