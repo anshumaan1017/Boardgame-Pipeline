@@ -56,15 +56,18 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
+  
       - name: Secret Scanner
-        uses: secret-scanner/action@0.0.2
-
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
+  
       - name: Upload Secret Scanning reports
         uses: actions/upload-artifact@v4
         with:
           name: secret-scanning-reports
           path: secret-scanning-reports
+
 
   build-tag-scan:
     runs-on: ubuntu-latest
