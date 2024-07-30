@@ -13,13 +13,12 @@ jobs:
 
       - name: Give execute permission to mvnw
         run: chmod +x ./mvnw
-
+      
       - name: Verify Maven Wrapper files
         run: |
-          ls -la .mvn/wrapper/
-          cat .mvn/wrapper/maven-wrapper.properties
           ls -la
-
+          ls -la ./mvnw
+      
       - name: Run Snyk to check for vulnerabilities
         uses: snyk/actions/maven@master
         continue-on-error: true
