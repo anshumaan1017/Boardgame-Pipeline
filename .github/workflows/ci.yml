@@ -39,19 +39,35 @@ jobs:
           path: njsscan
 
       
-      - name: Run Semgrep
-        env:
-          SEMGREP_TOKEN: ${{ secrets.SEMGREP_TOKEN }}
+  semgrep-full:
+    runs-on: ubuntu-latest
+    container:
+      image: returntocorp/semgrep
+    env:
+      SEMGREP_TOKEN: ${{ secrets.SEMGREP_TOKEN }}
+
+    steps:
+      - name: Clone application source code
+        uses: actions/checkout@v3
+
+      - name: Full scan
         run: |
-          curl -sSL https://semgrep.dev/get-semgrep | sh
-          semgrep scan --config=p/ci --error-format=json --output=semgrep-report.json
-      
-      - name: Upload Semgrep reports
-        if: always()
+          semgrep \
+            --sarif --output report.sarif \
+            --metrics=off \
+            --config="p/default"
+        
+
+      - name: Save report as pipeline artifact
         uses: actions/upload-artifact@v4
         with:
-          name: semgrep-reports
-          path: semgrep-report.json
+          name: semgrep-report
+          path: report.sarif
+
+      - name: Download report
+        uses: actions/download-artifact@v2
+        with: 
+          name: semgrep-report
 
   Static-Code-Quality-Check:
     runs-on: ubuntu-latest
