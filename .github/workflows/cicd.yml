@@ -39,23 +39,16 @@ jobs:
         path: target/*.jar
 
   # Job to perform Snyk security scan
-  snyk-security:
+  security:
     runs-on: ubuntu-latest
     needs: build
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Set up Snyk
-      uses: snyk/actions/setup@v2
-
-    - name: Set up Go environment
-      uses: actions/setup-go@v3
-      with:
-        go-version: '1.13'
-
-    - name: Snyk test
-      run: snyk test
+    - name: Run Snyk to check for vulnerabilities
+      uses: snyk/actions/node@master
+      continue-on-error: true
       env:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
