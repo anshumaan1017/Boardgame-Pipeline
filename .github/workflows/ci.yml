@@ -87,7 +87,7 @@ jobs:
           path: secret-scanning-reports
 
   Build-Tag-Push-Scan:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     needs: Secret-Scanning
     steps:
       - name: Remove target directory with sudo
