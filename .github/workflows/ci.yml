@@ -50,15 +50,14 @@ jobs:
 
       - name: Full scan
         run: |
-          semgrep --sarif --output report.sarif --metrics=off --config="p/default" --verbose
+          semgrep --json --output report.json --metrics=off --config="p/default" --verbose
 
       - name: Save report as pipeline artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: semgrep-report
-          path: report.sarif
-
+          path: report.json
           
   Static-Code-Quality-Check:
     runs-on: ubuntu-latest
