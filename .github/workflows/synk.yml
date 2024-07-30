@@ -4,7 +4,7 @@ on:
   push:
     branches: [ "main" ]
 
-jobs:
+jobs: 
   Check-Maven-Wrapper:
     runs-on: ubuntu-latest
     steps:
