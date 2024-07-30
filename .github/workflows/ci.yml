@@ -7,6 +7,8 @@ on:
 jobs:
   Static-Application-Security-Testing-SAST:
     runs-on: ubuntu-latest
+    container:
+      image: returntocorp/semgrep
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -26,39 +28,17 @@ jobs:
           name: shiftleft-sast-reports
           path: shiftleft
 
-      - name: njsscan check
-        uses: ajinabraham/njsscan-action@master
-        with:
-          args: '.'
-
-      - name: Upload njsscan reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: njsscan-reports
-          path: njsscan
-
-      
-  semgrep-full:
-    runs-on: ubuntu-latest
-    container:
-      image: returntocorp/semgrep
-
-    steps:
-      - name: Clone application source code
-        uses: actions/checkout@v3
-
-      - name: Full scan
+      - name: Run Semgrep scan
         run: |
           semgrep --json --output report.json --metrics=off --config="p/default" --verbose
 
-      - name: Save report as pipeline artifact
+      - name: Save Semgrep report as pipeline artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: semgrep-report
           path: report.json
-          
+
   Static-Code-Quality-Check:
     runs-on: ubuntu-latest
     needs: Static-Application-Security-Testing-SAST
