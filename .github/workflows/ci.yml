@@ -174,7 +174,7 @@ jobs:
       # Push Docker image
       - name: Push Docker Image
         run: |
-          docker push anshumaan10/boardgame:latest
+          docker push anshumaan10/boardgame:latest 
 
   kubernetes-deploy:
     runs-on: ubuntu-latest
