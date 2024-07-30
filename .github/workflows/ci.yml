@@ -24,7 +24,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: shiftleft-sast-reports
-          path: reports/shiftleft
+          path: shiftleft
 
       - name: njsscan check
         uses: ajinabraham/njsscan-action@master
@@ -36,7 +36,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: njsscan-reports
-          path: reports/njsscan
+          path: njsscan
 
   Static-Code-Quality-Check:
     runs-on: ubuntu-latest
@@ -133,6 +133,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+
+      - name: Give execute permission to mvnw
+        run: chmod +x mvnw
 
       - name: Run Snyk to check for vulnerabilities
         uses: snyk/actions/maven@master
