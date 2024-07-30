@@ -184,6 +184,8 @@ jobs:
         context: .
         push: true
         tags: anshumaan10/boardgame:latest
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
       
 
   # Job to apply Kubernetes manifests
