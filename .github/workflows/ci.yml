@@ -153,6 +153,9 @@ jobs:
       - name: Install Maven
         run: sudo apt-get install -y maven
 
+      - name: Give execute permission to mvnw
+        run: chmod +x mvnw
+
       - name: Run Snyk to check for vulnerabilities
         uses: snyk/actions/maven-3-jdk-17@master
         continue-on-error: true
