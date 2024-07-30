@@ -14,7 +14,7 @@ jobs:
       - name: Perform ShiftLeft Scan
         uses: ShiftLeftSecurity/scan-action@master
         with:
-          type: "java,html"
+          type: "java,javascript"
         env:
           WORKSPACE: https://github.com/${{ github.repository }}/blob/${{ github.sha }}
           GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
@@ -44,7 +44,7 @@ jobs:
       - name: SonarQube Quality Gate check
         id: sonarqube-quality-gate-check
         uses: sonarsource/sonarqube-quality-gate-action@master
-        timeout-minutes: 5
+        timeout-minutes: 10
         continue-on-error: true
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
