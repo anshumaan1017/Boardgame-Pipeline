@@ -18,8 +18,9 @@ jobs:
         env:
           WORKSPACE: https://github.com/${{ github.repository }}/blob/${{ github.sha }}
           GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
-      
+
       - name: Upload ShiftLeft SAST reports
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: shiftleft-sast-reports
@@ -31,6 +32,7 @@ jobs:
           args: '.'
 
       - name: Upload njsscan reports
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: njsscan-reports
@@ -72,16 +74,15 @@ jobs:
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
-          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE}} # Only required for Organizations, not personal accounts.
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }} # Only required for Organizations, not personal accounts.
         continue-on-error: true
-
   
       - name: Upload Secret Scanning reports
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: secret-scanning-reports
           path: secret-scanning-reports
-
 
   Build-Tag-Push-Scan:
     runs-on: self-hosted
@@ -90,7 +91,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Set up JDK 17
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
@@ -98,12 +98,11 @@ jobs:
           distribution: 'temurin'
           cache: maven
   
-      # Build the Maven project
       - name: Build with Maven
         run: mvn package --file pom.xml
   
-      # Upload Maven build artifact
       - name: Upload build artifact
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: Boardgame
@@ -115,23 +114,21 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
   
-      # Build Docker image
       - name: Build Docker Image
         run: docker build -t anshumaan10/boardgame:latest .
   
-      # Perform Trivy image scan
       - name: Trivy Image Scan
-        run: |
-          trivy image --format table -o trivy-image-report.html anshumaan10/boardgame:latest
+        run: trivy image --format table -o trivy-image-report.html anshumaan10/boardgame:latest
       
       - name: Upload Trivy Image Scan report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: trivy-image-report
           path: trivy-image-report.html
 
   Software-Composition-Analysis-SCA:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: Build-Tag-Push-Scan
     steps:
       - name: Checkout repository
@@ -144,16 +141,17 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
       - name: Upload Snyk reports
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: snyk-reports
           path: snyk-reports
 
       - name: Trivy FS Scan
-        run: |
-          trivy fs --format table -o trivy-fs-report.html .
+        run: trivy fs --format table -o trivy-fs-report.html .
     
       - name: Upload Trivy FS Scan report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: trivy-fs-report
@@ -166,6 +164,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      # Uncomment and configure the following steps for Kubernetes deployment
       # - name: Set up Kubectl
       #   uses: tale/kubectl-action@v1
       #   with:
