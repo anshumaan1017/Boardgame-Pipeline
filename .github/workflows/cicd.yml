@@ -180,7 +180,6 @@ jobs:
     steps:
     - name: Push Docker Image
       run: |
-        docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_TOKEN
         docker push anshumaan10/board:v1.0
 
 
