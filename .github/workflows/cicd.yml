@@ -31,11 +31,11 @@ jobs:
         name: Boardgame
         path: target/*.jar
 
-    # Set up QEMU and Docker Buildx
-    - name: Set up QEMU and Docker Buildx
-      run: |
-        docker/setup-qemu-action@v3
-        docker/setup-buildx-action@v3
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
 
     # Build Docker image
     - name: Build Docker Image
