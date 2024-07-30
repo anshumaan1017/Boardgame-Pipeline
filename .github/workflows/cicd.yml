@@ -1,8 +1,9 @@
 name: DevSecOps Pipeline
 
 on:
-  push:
-    branches: [ "main" ]
+  workflow_dispatch:
+  # push:
+  #   branches: [ "main" ]
 
 jobs:
   pipeline:
@@ -53,8 +54,9 @@ jobs:
         path: trivy-image-report.html
 
     # Perform Snyk security scan
-    - name: Run Snyk to check for vulnerabilities
-      uses: snyk/actions/node@master
+  
+    - name: RunSnyk to check for vulnerabilities
+      uses: snyk/actions/maven@master
       continue-on-error: true
       env:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
