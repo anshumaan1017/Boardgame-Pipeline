@@ -180,15 +180,14 @@ jobs:
     steps:
     - name: Push Docker Image
       uses: docker/build-push-action@v6
-      run: |
-        docker push anshumaan10/board:v1.0
-
+      with:
+        push: true
+        tags: anshumaan10/board:v1.0
 
   # Job to apply Kubernetes manifests
   kubectl-apply:
     runs-on: self-hosted
     needs: push-docker-image
-    
     permissions:
       contents: read
       id-token: write
