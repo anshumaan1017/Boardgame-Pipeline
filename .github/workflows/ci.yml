@@ -1,0 +1,137 @@
+name: DevSecOps Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  sast:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Perform ShiftLeft Scan
+        uses: ShiftLeftSecurity/scan-action@master
+        with:
+          type: "javascript,html"
+        env:
+          WORKSPACE: https://github.com/${{ github.repository }}/blob/${{ github.sha }}
+          GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
+      
+      - name: Upload SAST reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: sast-reports
+          path: reports
+
+  sonarcloud:
+    runs-on: ubuntu-latest
+    needs: sast
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: SonarQube Quality Gate check
+        id: sonarqube-quality-gate-check
+        uses: sonarsource/sonarqube-quality-gate-action@master
+        timeout-minutes: 5
+        continue-on-error: true
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+  secret-scanning:
+   runs-on: ubuntu-latest
+    needs: sonarcloud
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Secret Scanner
+        uses: secret-scanner/action@0.0.2
+
+      - name: Upload Secret Scanning reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: secret-scanning-reports
+          path: secret-scanning-reports
+
+  build-tag-scan:
+    runs-on: ubuntu-latest
+    needs: secret-scanning
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker Image
+        run: docker build -t anshumaan10/boardgame:latest .
+
+      - name: Perform Trivy image scan
+        run: trivy image --format table -o trivy-image-report.html anshumaan10/boardgame:latest
+
+      - name: Upload Trivy Image Scan report
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-image-report
+          path: trivy-image-report.html
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Push Docker Image
+        run: docker push anshumaan10/boardgame:latest
+
+  snyk:
+    runs-on: ubuntu-latest
+    needs: build-tag-scan
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/maven@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+      - name: Upload Snyk reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: snyk-reports
+          path: snyk-reports
+
+  kubernetes-deploy:
+    runs-on: ubuntu-latest
+    needs: snyk
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # - name: Set up Kubectl
+      #   uses: tale/kubectl-action@v1
+      #   with:
+      #     base64-kube-config: ${{ secrets.KUBE_CONFIG }}
+
+      # - name: Deploy to Kubernetes
+      #   run: |
+      #     kubectl apply -f deployment-service.yaml -n webapps
+      #     kubectl get svc -n webapps
