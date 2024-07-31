@@ -1,20 +1,15 @@
-name: Slack Notification
-
-on:
-  workflow_dispatch:
-
+name: slack_github_action
+on: [push]
 jobs:
-  build:
+  slack_notifier:
     runs-on: ubuntu-latest
-    env:
-      REPOSITORY_URL: docker.pkg.github.com
-      IMAGE_NAME: ${{ github.repository }}/alerta-cli
-      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-   
     steps:
-      - uses: act10ns/slack@v2
+      - name: Send notification on Slack using Webhooks
+        uses: slackapi/slack-github-action@v1.24.0
         with:
-          status: starting
-          channel: '#devsecops'
-          message: Starting Docker Build and Push...
-        if: always()
+          payload: |
+            {
+            "text": "Git push done in the repo , Boardgame-Pipeline"
+            }
+        env:
+          SLACK_WEBHOOK_URL: https://hooks.slack.com/services/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
