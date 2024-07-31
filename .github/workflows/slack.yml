@@ -1,5 +1,7 @@
-name: slack_github_action
+name: Slack Notification
+
 on: [push]
+
 jobs:
   slack_notifier:
     runs-on: ubuntu-latest
@@ -9,7 +11,7 @@ jobs:
         with:
           payload: |
             {
-            "text": "Git push done in the repo , Boardgame-Pipeline"
+              "text": "Git push done in the repo, Boardgame-Pipeline"
             }
         env:
-          SLACK_WEBHOOK_URL: https://hooks.slack.com/services/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
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
