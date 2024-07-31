@@ -9,7 +9,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Run tests
         run: |
@@ -24,17 +24,18 @@ jobs:
       - name: Get artifact download URL
         id: get-url
         run: |
-          curl -s \
+          artifact_id=$(curl -s \
             -H "Authorization: Bearer ${{ secrets.TOKEN_GITHUB }}" \
             -H "Accept: application/vnd.github.v3+json" \
             https://api.github.com/repos/${{ github.repository }}/actions/artifacts \
-            | jq -r '.artifacts[0].id' > artifact_id
-          curl -s \
+            | jq -r '.artifacts[0].id')
+          download_url=$(curl -s \
             -H "Authorization: Bearer ${{ secrets.TOKEN_GITHUB }}" \
             -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/repos/${{ github.repository }}/actions/artifacts/$(cat artifact_id)/zip \
-            | jq -r '.url' > download_url
-          echo "artifact_download_url=$(cat download_url)" >> $GITHUB_ENV
+            https://api.github.com/repos/${{ github.repository }}/actions/artifacts/$artifact_id/zip \
+            | jq -r '.url')
+          echo "::set-env name=artifact_download_url::$download_url"
+          
       - name: Send notification on Slack using Webhooks
         id: slack
         uses: slackapi/slack-github-action@v1.26.0
