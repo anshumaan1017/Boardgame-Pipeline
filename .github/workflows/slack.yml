@@ -9,36 +9,27 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Prepare Slack Payload
-        id: prepare_payload
-        run: |
-          BUILD_DURATION="Unknown" # Replace this with the actual duration if you have it available.
-          REPO_URL="https://github.com/${{ github.repository }}"
-          BRANCH_URL="${{ github.server_url }}/${{ github.repository }}/tree/${{ github.ref_name }}"
-          BUILD_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-
-          echo '{
-            "attachments": [
-              {
-                "color": "'"${{ job.status == 'success' && 'good' || 'danger' }}"'",
-                "blocks": [
-                  {
-                    "type": "section",
-                    "text": {
-                      "type": "mrkdwn",
-                      "text": "*Repository:* ${{ github.repository }}\n*Branch:* ${{ github.ref_name }}\n*Commit ID:* ${{ github.sha }}\n*Commit Message:* ${{ github.event.head_commit.message }}\n*Author:* ${{ github.event.head_commit.author.name }}\n*Email:* ${{ github.event.head_commit.author.email }}\n*Build Status:* ${{ job.status }}\n*Build Duration:* '$BUILD_DURATION'\n*Repository URL:* $REPO_URL\n*Branch URL:* $BRANCH_URL\n*Build URL:* $BUILD_URL\n*Commit URL:* ${{ github.event.head_commit.url }}"
-                    }
-                  }
-                ]
-              }
-            ]
-          }' > slack_payload.json
-
       - name: Send notification on Slack using Webhooks
         id: slack
         uses: slackapi/slack-github-action@v1.26.0
         with:
-          payload: ${{ steps.prepare_payload.outputs.slack_payload }}
+          payload: |
+            {
+              "attachments": [
+                {
+                  "color": "${{ job.status == 'success' && 'good' || 'danger' }}",
+                  "blocks": [
+                    {
+                      "type": "section",
+                      "text": {
+                        "type": "mrkdwn",
+                        "text": "*Repository:* ${{ github.repository }}\n*Branch:* ${{ github.ref_name }}\n*Commit ID:* ${{ github.sha }}\n*Commit Message:* ${{ github.event.head_commit.message }}\n*Author:* ${{ github.event.head_commit.author.name }}\n*Build Status:* ${{ job.status }}\n*Commit URL:* ${{ github.event.head_commit.url }}"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
