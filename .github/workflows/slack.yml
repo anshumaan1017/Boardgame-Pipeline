@@ -4,19 +4,17 @@ on:
   workflow_dispatch:
 
 jobs:
-  slack-notification:
+  build:
     runs-on: ubuntu-latest
-    name: Post to Slack
+    env:
+      REPOSITORY_URL: docker.pkg.github.com
+      IMAGE_NAME: ${{ github.repository }}/alerta-cli
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+   
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-    
-      - uses: act10ns/slack@v2.1.0
+      - uses: act10ns/slack@v2
         with:
-          status: ${{ job.status }}
-          #fields: repo,message,commit,author,action,eventName,ref,workflow,job,took,pullRequest # selectable (default: repo,message)
-          message: "It started"
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        if: always() # Pick up events even if the job fails or is canceled.
+          status: starting
+          channel: '#devsecops'
+          message: Starting Docker Build and Push...
+        if: always()
