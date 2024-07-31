@@ -1,7 +1,7 @@
 name: Slack Notification with Artifact
 
 on: [push]
-
+ 
 jobs:
   build_and_notify:
     runs-on: ubuntu-latest
