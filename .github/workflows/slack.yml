@@ -11,45 +11,30 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      # Run your build and tests here
       - name: Run tests
         run: |
           echo "Running tests..."
-          # Simulate running tests and creating a report
           echo "Test results" > test-results.txt
 
-      # Upload the artifact
       - name: Upload test results
         uses: actions/upload-artifact@v3
         with:
           name: test-results
           path: test-results.txt
 
-      # Get the artifact download URL
       - name: Get artifact download URL
         id: get-url
         run: |
-          # Fetch all artifacts
-          response=$(curl -s \
+          artifact_id=$(curl -s \
             -H "Authorization: token ${{ secrets.TOKEN_GITHUB }}" \
             -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/repos/${{ github.repository }}/actions/artifacts)
-          
-          # Extract the artifact ID
-          artifact_id=$(echo "$response" | jq -r '.artifacts[0].id')
-          
-          if [ -z "$artifact_id" ]; then
-            echo "Artifact ID not found"
-            exit 1
-          fi
+            https://api.github.com/repos/${{ github.repository }}/actions/artifacts \
+            | jq -r '.artifacts[0].id')
 
-          # Construct the artifact download URL
-          download_url="https://api.github.com/repos/${{ github.repository }}/actions/artifacts/$artifact_id/zip"
-
-          # Export the URL as an environment variable
+          download_url="https://api.github.com/repos/${{ github.repository }}/actions/artifacts/$artifact_id/zip?access_token=${{ secrets.TOKEN_GITHUB }}"
+          
           echo "artifact_download_url=$download_url" >> $GITHUB_ENV
 
-      # Send notification on Slack using Webhooks
       - name: Send notification on Slack using Webhooks
         id: slack
         uses: slackapi/slack-github-action@v1.26.0
