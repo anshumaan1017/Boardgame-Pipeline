@@ -15,14 +15,18 @@ jobs:
         with:
           payload: |
             {
-              "text": "GitHub Action build result: ${{ job.status }}\n${{ github.event.pull_request.html_url || github.event.head_commit.url }}",
-              "blocks": [
+              "attachments": [
                 {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "GitHub Action build result: ${{ job.status }}\n${{ github.event.pull_request.html_url || github.event.head_commit.url }}"
-                  }
+                  "color": ${{ job.status == 'success' && 'good' || 'danger' }},
+                  "blocks": [
+                    {
+                      "type": "section",
+                      "text": {
+                        "type": "mrkdwn",
+                        "text": "*Repository:* ${{ github.repository }}\n*Branch:* ${{ github.ref_name }}\n*Commit ID:* ${{ github.sha }}\n*Commit Message:* ${{ github.event.head_commit.message }}\n*Author:* ${{ github.event.head_commit.author.name }}\n*Build Status:* ${{ job.status }}\n*Commit URL:* ${{ github.event.head_commit.url }}"
+                      }
+                    }
+                  ]
                 }
               ]
             }
