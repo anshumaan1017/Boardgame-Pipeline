@@ -1,16 +1,44 @@
-name: Slack Notification
+name: Slack Notification with Artifact
 
-on: 
-
-  workflow_dispatch:
+on: [push]
 
 jobs:
-  slack_notifier:
+  build_and_notify:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
+      # Run your build and tests here
+      - name: Run tests
+        run: |
+          echo "Running tests..."
+          # Simulate running tests and creating a report
+          echo "Test results" > test-results.txt
+
+      # Upload the artifact
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: test-results.txt
+
+      # Get the artifact download URL
+      - name: Get artifact download URL
+        id: get-url
+        run: |
+          artifact_id=$(curl -s \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/${{ github.repository }}/actions/artifacts \
+            | jq -r '.artifacts[0].id')
+          
+          download_url="https://api.github.com/repos/${{ github.repository }}/actions/artifacts/$artifact_id/zip"
+          
+          echo "artifact_download_url=$download_url" >> $GITHUB_ENV
+
+      # Send notification on Slack using Webhooks
       - name: Send notification on Slack using Webhooks
         id: slack
         uses: slackapi/slack-github-action@v1.26.0
@@ -25,7 +53,7 @@ jobs:
                       "type": "section",
                       "text": {
                         "type": "mrkdwn",
-                        "text": "*Repository:* ${{ github.repository }}\n*Branch:* ${{ github.ref_name }}\n*Commit ID:* ${{ github.sha }}\n*Commit Message:* ${{ github.event.head_commit.message }}\n*Author:* ${{ github.event.head_commit.author.name }}\n*Build Status:* ${{ job.status }}\n*Commit URL:* ${{ github.event.head_commit.url }}"
+                        "text": "*Repository:* ${{ github.repository }}\n*Branch:* ${{ github.ref_name }}\n*Commit ID:* ${{ github.sha }}\n*Commit Message:* ${{ github.event.head_commit.message }}\n*Author:* ${{ github.event.head_commit.author.name }}\n*Build Status:* ${{ job.status }}\n*Commit URL:* ${{ github.event.head_commit.url }}\n*Artifact URL:* [Download Artifact](${{ env.artifact_download_url }})"
                       }
                     }
                   ]
