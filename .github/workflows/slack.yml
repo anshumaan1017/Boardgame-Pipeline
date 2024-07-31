@@ -24,7 +24,7 @@ jobs:
           name: test-results
           path: test-results.txt
 
-      # Get the artifact ID and create a presigned URL
+      # Get the artifact download URL
       - name: Get artifact download URL
         id: get-url
         run: |
@@ -34,8 +34,8 @@ jobs:
             https://api.github.com/repos/${{ github.repository }}/actions/artifacts \
             | jq -r '.artifacts[0].id')
           
-          # Create presigned URL
-          download_url="https://api.github.com/repos/${{ github.repository }}/actions/artifacts/$artifact_id/zip"
+          # Construct the artifact download URL
+          download_url="https://api.github.com/repos/${{ github.repository }}/actions/artifacts/$artifact_id/zip?access_token=${{ secrets.TOKEN_GITHUB }}"
           
           echo "artifact_download_url=$download_url" >> $GITHUB_ENV
 
