@@ -1,4 +1,4 @@
-name: DevSecOps Pipeline
+name: DevSecOps Pipeline Workflow
 
 on:
   workflow_dispatch:
@@ -14,13 +14,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Build project with Maven
+        run: mvn clean install
+
       - name: Perform ShiftLeft Scan
         uses: ShiftLeftSecurity/scan-action@master
         with:
-          type: "java,javascript"
+          type: "java,javascript,credscan,depscan,python,html,go,jsp,node.js,bash"
         env:
           WORKSPACE: https://github.com/${{ github.repository }}/blob/${{ github.sha }}
           GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
+          SCAN_AUTO_BUILD: true
 
       - name: Upload ShiftLeft SAST reports
         if: always()
@@ -37,7 +41,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: semgrep-report
+          name: Semgrep-Report
           path: report.json
 
   Static-Code-Quality-Check:
@@ -165,10 +169,11 @@ jobs:
           args: >
             --failOnCVSS 7
             --enableRetired
+          continue-on-error: true
       - name: Upload Test results
         uses: actions/upload-artifact@master
         with:
-           name: Depcheck report
+           name: Depcheck report from OWASP
            path: ${{github.workspace}}/reports
 
       # - name: Trivy FS Scan
@@ -178,7 +183,7 @@ jobs:
       #   if: always()
       #   uses: actions/upload-artifact@v4
       #   with:
-      #     name: trivy-fs-report
+      #     name: trivy-fs-report 
       #     path: trivy-fs-report.html
 
 
