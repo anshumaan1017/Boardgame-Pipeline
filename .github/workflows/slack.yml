@@ -17,7 +17,7 @@ jobs:
             {
               "attachments": [
                 {
-                  "color": ${{ job.status == 'success' && 'good' || 'danger' }},
+                  "color": "${{ job.status == 'success' && 'good' || 'danger' }}",
                   "blocks": [
                     {
                       "type": "section",
