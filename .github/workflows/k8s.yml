@@ -8,8 +8,7 @@ on:
 jobs:
   kubernetes-deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write-all
+    permissions: write-all
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
