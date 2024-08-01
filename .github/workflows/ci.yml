@@ -62,7 +62,8 @@ jobs:
 
       - name: Clean up repository directory
         run: |
-          sudo rm -rf /home/runner/work/Boardgame-Pipeline
+           sudo rm -rf /home/anshumaansingh10jan/actions-runner/_work/Boardgame-Pipeline
+        continue-on-error: true
 
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -140,7 +141,8 @@ jobs:
     steps:
        - name: Clean up repository directory
          run: |
-          sudo rm -rf /home/runner/work/Boardgame-Pipeline
+           sudo rm -rf /home/anshumaansingh10jan/actions-runner/_work/Boardgame-Pipeline
+         continue-on-error: true
 
        - name: Checkout repository
          uses: actions/checkout@v3
@@ -260,7 +262,8 @@ jobs:
     steps:
       - name: Clean up repository directory
         run: |
-          sudo rm -rf /home/runner/work/Boardgame-Pipeline
+           sudo rm -rf /home/anshumaansingh10jan/actions-runner/_work/Boardgame-Pipeline
+        continue-on-error: true
 
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -322,7 +325,8 @@ jobs:
     steps:
        - name: Clean up repository directory
          run: |
-           sudo rm -rf /home/runner/work/Boardgame-Pipeline
+           sudo rm -rf /home/anshumaansingh10jan/actions-runner/_work/Boardgame-Pipeline
+         continue-on-error: true
 
        - name: Checkout repository
          uses: actions/checkout@v3
