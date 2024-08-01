@@ -1,0 +1,39 @@
+name: Kubernetes-Deploy-and-Audit
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  kubernetes-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Download kubeaudit
+        run: |
+          curl -L -o kubeaudit.tar.gz https://github.com/Shopify/kubeaudit/releases/download/v0.22.1/kubeaudit_0.22.1_linux_amd64.tar.gz
+          tar -xzf kubeaudit.tar.gz
+          chmod +x kubeaudit
+
+      - name: Set up Kubectl
+        uses: tale/kubectl-action@v1
+        with:
+          base64-kube-config: ${{ secrets.KUBE_CONFIG }}
+
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl apply -f deployment-service.yaml -n webapps
+          kubectl get svc -n webapps
+
+      - name: Run kubeaudit
+        run: |
+          ./kubeaudit all -kubeconfig <(echo ${{ secrets.KUBE_CONFIG }} | base64 -d) > kubeaudit-report.txt
+
+      - name: Upload kubeaudit results
+        uses: actions/upload-artifact@v3
+        with:
+          name: kubeaudit-report
+          path: kubeaudit-report.txt
