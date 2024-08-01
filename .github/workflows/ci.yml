@@ -21,21 +21,21 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Perform ShiftLeft Scan
-        uses: ShiftLeftSecurity/scan-action@master
-        with:
-          type: "java,javascript,credscan,depscan,python,html,go,jsp,node.js,bash"
-        env:
-          WORKSPACE: https://github.com/${{ github.repository }}/blob/${{ github.sha }}
-          GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
-          SCAN_AUTO_BUILD: true
+      # - name: Perform ShiftLeft Scan
+      #   uses: ShiftLeftSecurity/scan-action@master
+      #   with:
+      #     type: "java,javascript,credscan,depscan,python,html,go,jsp,node.js,bash"
+      #   env:
+      #     WORKSPACE: https://github.com/${{ github.repository }}/blob/${{ github.sha }}
+      #     GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
+      #     SCAN_AUTO_BUILD: true
 
-      - name: Upload ShiftLeft SAST reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: shiftleft-sast-reports
-          path: shiftleft
+      # - name: Upload ShiftLeft SAST reports
+      #   if: always()
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: shiftleft-sast-reports
+      #     path: shiftleft
 
       - name: Run Semgrep scan
         run: |
@@ -49,7 +49,7 @@ jobs:
           path: report.json
 
   Static-Code-Quality-Check:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       id-token: write
@@ -60,31 +60,9 @@ jobs:
     needs: Static-Application-Security-Testing-SAST
     steps:
 
-      - name: Clean up repository directory
-        run: |
-           sudo rm -rf /home/anshumaansingh10jan/actions-runner/_work/Boardgame-Pipeline
-        continue-on-error: true
-
-      - name: Clean up repository directory
-        run: |
-          sudo rm -rf /home/anshumaansingh10jan/actions-runner/_work/Boardgame-Pipeline
-        continue-on-error: true
-
       - name: Checkout repository
         uses: actions/checkout@v3
-        with:
-          repository: anshumaan-10/Boardgame-Pipeline
-          token: ${{ secrets.TOKEN_GITHUB }}  # Ensure you use the correct secret for GitHub authentication
-          ssh-strict: true
-          persist-credentials: true
-          clean: true
-          sparse-checkout-cone-mode: true
-          fetch-depth: 1
-          fetch-tags: false
-          lfs: false
-          submodules: false
-          set-safe-directory: true
-
+          
       - name: SonarQube Scan
         uses: sonarsource/sonarqube-scan-action@master
         env:
