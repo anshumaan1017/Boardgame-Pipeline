@@ -58,23 +58,23 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # - name: SonarQube Scan
-      #   uses: sonarsource/sonarqube-scan-action@master
-      #   env:
-      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      #     SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
-      # - name: Install jq
-      #   run: sudo apt-get update && sudo apt-get install -y jq
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
 
-      # - name: SonarQube Quality Gate check
-      #   id: sonarqube-quality-gate-check
-      #   uses: sonarsource/sonarqube-quality-gate-action@master
-      #   timeout-minutes: 10
-      #   continue-on-error: true
-      #   env:
-      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      #     SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      - name: SonarQube Quality Gate check
+        id: sonarqube-quality-gate-check
+        uses: sonarsource/sonarqube-quality-gate-action@master
+        timeout-minutes: 10
+        continue-on-error: true
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
   Secret-Scanning:
     runs-on: ubuntu-latest
@@ -133,15 +133,15 @@ jobs:
       - name: Build Docker Image
         run: docker build -t anshumaan10/boardgame:latest .
   
-      # - name: Trivy Image Scan
-      #   run: trivy image --format table -o trivy-image-report.html anshumaan10/boardgame:latest
+      - name: Trivy Image Scan
+        run: trivy image --format table -o trivy-image-report.html anshumaan10/boardgame:latest
       
-      # - name: Upload Trivy Image Scan report
-      #   if: always()
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: trivy-image-report
-      #     path: trivy-image-report.html
+      - name: Upload Trivy Image Scan report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-image-report
+          path: trivy-image-report.html
 
       # Login to Docker Hub
       - name: Login to Docker Hub
@@ -160,11 +160,11 @@ jobs:
     needs: Build-Tag-Push-Scan
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
-        
+        uses: actions/checkout@v2
+
       - name: Build project with Maven
         run: mvn clean install
-        
+
       - name: Depcheck
         uses: dependency-check/Dependency-Check_Action@main
         id: Depcheck
@@ -176,22 +176,23 @@ jobs:
           args: >
             --failOnCVSS 7
             --enableRetired
-          continue-on-error: true
+        continue-on-error: true
+
       - name: Upload Test results
         uses: actions/upload-artifact@master
         with:
-           name: Depcheck report from OWASP
-           path: ${{github.workspace}}/reports
+          name: Depcheck report
+          path: ${{ github.workspace }}/reports
 
-      # - name: Trivy FS Scan
-      #   run: trivy fs --format table -o trivy-fs-report.html .
+      - name: Trivy FS Scan
+        run: trivy fs --format table -o trivy-fs-report.html .
     
-      # - name: Upload Trivy FS Scan report
-      #   if: always()
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: trivy-fs-report 
-      #     path: trivy-fs-report.html
+      - name: Upload Trivy FS Scan report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-fs-report 
+          path: trivy-fs-report.html
 
 
   kubernetes-deploy:
@@ -201,7 +202,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Uncomment and configure the following steps for Kubernetes deployment
+      # #Uncomment and configure the following steps for Kubernetes deployment
       # - name: Set up Kubectl
       #   uses: tale/kubectl-action@v1
       #   with:
