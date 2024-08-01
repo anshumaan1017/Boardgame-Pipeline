@@ -109,24 +109,9 @@ jobs:
       security-events: write
 
     steps:
-       - name: Clean up repository directory
-         run: |
-           sudo rm -rf /home/runner/work/Boardgame-Pipeline
 
        - name: Checkout repository
          uses: actions/checkout@v3
-         with:
-            repository: anshumaan-10/Boardgame-Pipeline
-            token: ${{ secrets.TOKEN_GITHUB }}  # Ensure you use the correct secret for GitHub authentication
-            ssh-strict: true
-            persist-credentials: true
-            clean: true
-            sparse-checkout-cone-mode: true
-            fetch-depth: 1
-            fetch-tags: false
-            lfs: false
-            submodules: false
-            set-safe-directory: true
   
        - name: Secret Scanner
          uses: gitleaks/gitleaks-action@v2
