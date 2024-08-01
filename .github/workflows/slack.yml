@@ -15,6 +15,7 @@ jobs:
         run: |
           echo "Running tests..."
           echo "Test results" > test-results.txt
+
       - name: Upload test results
         uses: actions/upload-artifact@v3
         with:
@@ -25,17 +26,19 @@ jobs:
         id: get-url
         run: |
           artifact_id=$(curl -s \
-            -H "Authorization: Bearer ${{ secrets.TOKEN_GITHUB }}" \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
             -H "Accept: application/vnd.github.v3+json" \
             https://api.github.com/repos/${{ github.repository }}/actions/artifacts \
             | jq -r '.artifacts[0].id')
           download_url="https://api.github.com/repos/${{ github.repository }}/actions/artifacts/$artifact_id/zip"
           echo "artifact_download_url=$download_url" >> $GITHUB_ENV
+
       - name: Construct curl command for Slack
         id: construct-curl
         run: |
-          curl_command="curl -L -H 'Accept: application/vnd.github+json' -H 'Authorization: Bearer ${{ secrets.TOKEN_GITHUB }}' -H 'X-GitHub-Api-Version: 2022-11-28' ${artifact_download_url} --output artifact.zip"
+          curl_command="curl -L -H 'Accept: application/vnd.github+json' -H 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' -H 'X-GitHub-Api-Version: 2022-11-28' ${artifact_download_url} --output artifact.zip"
           echo "curl_command=$curl_command" >> $GITHUB_ENV
+
       - name: Send notification on Slack using Webhooks
         id: slack
         uses: slackapi/slack-github-action@v1.26.0
