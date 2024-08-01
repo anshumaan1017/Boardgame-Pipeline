@@ -33,7 +33,7 @@ jobs:
       - name: Run kubeaudit
         env:
           KUBECONFIG: $HOME/.kube/config
-        run: ./kubeaudit all -kubeconfig $HOME/.kube/config > kubeaudit-report.txt
+        run: ./kubeaudit all 
 
       - name: Upload kubeaudit results
         uses: actions/upload-artifact@v3
