@@ -37,7 +37,7 @@ jobs:
           docker pull anshumaan10/boardgame:latest
 
       - name: Generate SBOM and Upload Artifact
-        uses: anchore/sbom-action@v1
+        uses: anchore/sbom-action@v0
         with:
           image: anshumaan10/boardgame:latest
           format: spdx-json
