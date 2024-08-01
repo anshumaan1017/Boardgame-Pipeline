@@ -1,9 +1,10 @@
 name: Kubernetes-Deploy-and-Audit
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch
+  # push:
+  #   branches:
+  #     - main
 
 jobs:
   kubernetes-deploy:
