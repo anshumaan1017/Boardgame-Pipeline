@@ -59,6 +59,11 @@ jobs:
 
     needs: Static-Application-Security-Testing-SAST
     steps:
+
+      - name: Clean up repository directory
+        run: |
+          sudo rm -rf /home/anshumaansingh10jan/actions-runner/_work/Boardgame-Pipeline
+
       - name: Checkout repository
         uses: actions/checkout@v3
 
