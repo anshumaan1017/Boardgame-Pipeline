@@ -25,7 +25,8 @@ jobs:
           
       - name: Run kubeaudit
         run: |
-          ./kubeaudit all -kubeconfig <(echo ${{ secrets.KUBE_CONFIG }} | base64 -d) > kubeaudit-report.txt
+          echo ${{ secrets.KUBE_CONFIG }} | base64 -d > kubeconfig
+          ./kubeaudit all -kubeconfig kubeconfig > kubeaudit-report.txt
 
       - name: Upload kubeaudit results
         uses: actions/upload-artifact@v3
