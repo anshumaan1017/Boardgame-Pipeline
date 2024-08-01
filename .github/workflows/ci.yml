@@ -52,7 +52,7 @@ jobs:
           path: report.json
 
   Static-Code-Quality-Check:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: Static-Application-Security-Testing-SAST
     steps:
       - name: Checkout repository
@@ -77,7 +77,7 @@ jobs:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
   Secret-Scanning:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: Static-Code-Quality-Check
     steps:
       - name: Checkout repository
@@ -98,7 +98,7 @@ jobs:
           path: secret-scanning-reports
 
   Build-Tag-Push-Scan:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: Secret-Scanning
     steps:
       - name: Remove target directory with sudo
@@ -156,7 +156,7 @@ jobs:
           docker push anshumaan10/boardgame:latest 
 
   Software-Composition-Analysis-SCA:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: Build-Tag-Push-Scan
     steps:
       - name: Checkout
