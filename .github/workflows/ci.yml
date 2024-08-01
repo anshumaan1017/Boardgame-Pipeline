@@ -179,6 +179,7 @@ jobs:
           docker push anshumaan10/boardgame:latest 
 
   Software-Bill-of-Material-SBOM:
+    needs: Build-Tag-Push-Scan
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -187,35 +188,35 @@ jobs:
       actions: read
       security-events: write
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v3
-      
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
-      
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Log in to Docker Hub
+      - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build Docker Image
+      - name: Pull Docker Image
         run: |
-          docker buildx build --platform linux/amd64,linux/arm64 -t anshumaan10/boardgame:v1.0 --push .
+          docker pull anshumaan10/boardgame:latest
 
-      - name: Generate SBOM with Anchore
+
+      - name: Generate SBOM and Upload Artifact
         uses: anchore/sbom-action@v0
         with:
-          image: anshumaan10/boardgame:v1.0
-
-      - name: Upload SBOM report
-        uses: actions/upload-artifact@v4
-        with:
-          name: sbom-report
-          path: sbom-report.json
+          image: anshumaan10/boardgame:latest
+          format: spdx-json
+          artifact-name: sbom-report.spdx.json
+          output-file: sbom-report.json
+          upload-artifact: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
   Software-Composition-Analysis-SCA:
     runs-on: self-hosted
