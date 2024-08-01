@@ -288,23 +288,35 @@ jobs:
 
     needs: Software-Composition-Analysis-SCA
     steps:
-      - name: Clean up repository directory
-        run: |
-          sudo rm -rf /home/anshumaansingh10jan/actions-runner/_work/Boardgame-Pipeline
-          
-      - name: Checkout repository
-        uses: actions/checkout@v3
+       - name: Clean up repository directory
+         run: |
+           sudo rm -rf /home/runner/work/Boardgame-Pipeline
+
+       - name: Checkout repository
+         uses: actions/checkout@v3
+         with:
+            repository: anshumaan-10/Boardgame-Pipeline
+            token: ${{ secrets.GITHUB_TOKEN }}  # Ensure you use the correct secret for GitHub authentication
+            ssh-strict: true
+            persist-credentials: true
+            clean: true
+            sparse-checkout-cone-mode: true
+            fetch-depth: 1
+            fetch-tags: false
+            lfs: false
+            submodules: false
+            set-safe-directory: true
 
       # Uncomment and configure the following steps for Kubernetes deployment
-      - name: Set up Kubectl
-        uses: tale/kubectl-action@v1
-        with:
-          base64-kube-config: ${{ secrets.KUBE_CONFIG }}
+       - name: Set up Kubectl
+         uses: tale/kubectl-action@v1
+         with:
+            base64-kube-config: ${{ secrets.KUBE_CONFIG }}
 
-      - name: Deploy to Kubernetes
-        run: |
-          kubectl apply -f deployment-service.yaml -n webapps
-          kubectl get svc -n webapps
+       - name: Deploy to Kubernetes
+         run: |
+            kubectl apply -f deployment-service.yaml -n webapps
+            kubectl get svc -n webapps
 
   DAST-Scan:
     runs-on: ubuntu-latest
