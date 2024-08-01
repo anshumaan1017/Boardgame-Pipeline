@@ -10,6 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      id-token: write
+      packages: write
+      security-events: write
+      statuses: write
 
     steps:
       - name: Checkout repository
@@ -35,6 +39,8 @@ jobs:
           chmod +x kubeaudit
 
       - name: Run kubeaudit
+        env:
+          KUBECONFIG: $HOME/.kube/config
         run: ./kubeaudit all -kubeconfig $HOME/.kube/config > kubeaudit-report.txt
 
       - name: Upload kubeaudit results
