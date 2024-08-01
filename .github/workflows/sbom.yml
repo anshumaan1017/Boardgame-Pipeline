@@ -34,18 +34,18 @@ jobs:
 
       - name: Pull Docker Image
         run: |
-          docker pull anshumaan10/boardgame:v1.0
+          docker pull anshumaan10/boardgame:latest
 
       - name: Run Anchore SBOM Scan
         run: |
           # Replace with your Anchore CLI command to perform SBOM scan
-          anchore-cli image add anshumaan10/boardgame:v1.0
-          anchore-cli image vuln anshumaan10/boardgame:v1.0 all
+          anchore-cli image add anshumaan10/boardgame:latest
+          anchore-cli image vuln anshumaan10/boardgame:latest all
 
       - name: Generate SBOM Report
         run: |
           # Replace with your command to generate SBOM report
-          anchore-cli image sbom anshumaan10/boardgame:v1.0 > sbom-report.json
+          anchore-cli image sbom anshumaan10/boardgame:latest > sbom-report.json
 
       - name: Upload SBOM Report as Artifact
         uses: actions/upload-artifact@v3
