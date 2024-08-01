@@ -24,9 +24,6 @@ jobs:
         with:
           version: 'latest'
 
-      - name: Test Kubernetes connectivity
-        run: kubectl cluster-info
-
       - name: Download kubeaudit
         run: |
           curl -L -o kubeaudit.tar.gz https://github.com/Shopify/kubeaudit/releases/download/v0.22.1/kubeaudit_0.22.1_linux_amd64.tar.gz
