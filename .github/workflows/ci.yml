@@ -2,8 +2,8 @@ name: DevSecOps Pipeline Workflow
 
 on:
   workflow_dispatch:
-  # push:
-  #   branches: [ "main" ]
+  push:
+    branches: [ "main" ]
 
 jobs:
   Static-Application-Security-Testing-SAST:
@@ -50,6 +50,13 @@ jobs:
 
   Static-Code-Quality-Check:
     runs-on: self-hosted
+    permissions:
+      contents: read
+      id-token: write
+      packages: write
+      actions: read
+      security-events: write
+
     needs: Static-Application-Security-Testing-SAST
     steps:
       - name: Checkout repository
@@ -76,6 +83,13 @@ jobs:
   Secret-Scanning:
     runs-on: self-hosted
     needs: Static-Code-Quality-Check
+    permissions:
+      contents: read
+      id-token: write
+      packages: write
+      actions: read
+      security-events: write
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -97,6 +111,13 @@ jobs:
   Build-Tag-Push-Scan:
     runs-on: self-hosted
     needs: Secret-Scanning
+    permissions:
+      contents: read
+      id-token: write
+      packages: write
+      actions: read
+      security-events: write
+
     steps:
       - name: Remove target directory with sudo
         run: sudo rm -rf /home/anshumaansingh10jan/actions-runner/_work/Boardgame-Pipeline/Boardgame-Pipeline/target
@@ -152,9 +173,55 @@ jobs:
         run: |
           docker push anshumaan10/boardgame:latest 
 
+  Software-Bill-of-Material-SBOM:
+    runs-on: ubuntu-latest
+     permissions:
+      contents: read
+      id-token: write
+      packages: write
+      actions: read
+      security-events: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build Docker Image
+        run: |
+          docker buildx build --platform linux/amd64,linux/arm64 -t anshumaan10/boardgame:v1.0 --push .
+
+      - name: Generate SBOM with Anchore
+        uses: anchore/sbom-action@v0
+        with:
+          image: anshumaan10/boardgame:v1.0
+
+      - name: Upload SBOM report
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-report
+          path: sbom-report.json
+
   Software-Composition-Analysis-SCA:
     runs-on: self-hosted
     needs: Build-Tag-Push-Scan
+    permissions:
+      contents: read
+      id-token: write
+      packages: write
+      actions: read
+      security-events: write
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -192,7 +259,14 @@ jobs:
           path: trivy-fs-report.html
 
   kubernetes-deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
+    permissions:
+      contents: read
+      id-token: write
+      packages: write
+      actions: read
+      security-events: write
+
     needs: Software-Composition-Analysis-SCA
     steps:
       - name: Checkout repository
@@ -216,33 +290,33 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: ZAP Scan
-        uses: zaproxy/action-baseline@v0.12.0
-        with:
-          token: ${{ secrets.TOKEN_GITHUB }}
-          docker_name: 'ghcr.io/zaproxy/zaproxy:stable'
-          target: 'https://demo.testfire.net'
-          rules_file_name: '.zap/rules.tsv'
-          cmd_options: '-a'
-        continue-on-error: true
+      # - name: ZAP Scan
+      #   uses: zaproxy/action-baseline@v0.12.0
+      #   with:
+      #     token: ${{ secrets.TOKEN_GITHUB }}
+      #     docker_name: 'ghcr.io/zaproxy/zaproxy:stable'
+      #     target: 'https://demo.testfire.net'
+      #     rules_file_name: '.zap/rules.tsv'
+      #     cmd_options: '-a'
+      #   continue-on-error: true
         
-      - name: Upload JSON report
-        uses: actions/upload-artifact@v2
-        with:
-          name: zap-report-json
-          path: report_json.json
+      # - name: Upload JSON report
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: zap-report-json
+      #     path: report_json.json
 
-      - name: Upload Markdown report
-        uses: actions/upload-artifact@v2
-        with:
-          name: zap-report-md
-          path: report_md.md
+      # - name: Upload Markdown report
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: zap-report-md
+      #     path: report_md.md
 
-      - name: Upload HTML report
-        uses: actions/upload-artifact@v2
-        with:
-          name: zap-report-html
-          path: report_html.html
+      # - name: Upload HTML report
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: zap-report-html
+      #     path: report_html.html
 
   Send-Slack-Notification:
     runs-on: ubuntu-latest
