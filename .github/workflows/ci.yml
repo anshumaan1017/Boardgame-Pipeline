@@ -62,10 +62,22 @@ jobs:
 
       - name: Clean up repository directory
         run: |
-          sudo rm -rf /home/anshumaansingh10jan/actions-runner/_work/Boardgame-Pipeline
+          sudo rm -rf /home/runner/work/Boardgame-Pipeline
 
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          repository: anshumaan-10/Boardgame-Pipeline
+          token: ${{ secrets.GITHUB_TOKEN }}  # Ensure you use the correct secret for GitHub authentication
+          ssh-strict: true
+          persist-credentials: true
+          clean: true
+          sparse-checkout-cone-mode: true
+          fetch-depth: 1
+          fetch-tags: false
+          lfs: false
+          submodules: false
+          set-safe-directory: true
 
       - name: SonarQube Scan
         uses: sonarsource/sonarqube-scan-action@master
