@@ -21,9 +21,6 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Build project with Maven
-        run: mvn clean install
-
       - name: Perform ShiftLeft Scan
         uses: ShiftLeftSecurity/scan-action@master
         with:
