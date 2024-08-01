@@ -22,12 +22,7 @@ jobs:
         uses: tale/kubectl-action@v1
         with:
           base64-kube-config: ${{ secrets.KUBE_CONFIG }}
-
-      - name: Deploy to Kubernetes
-        run: |
-          kubectl apply -f deployment-service.yaml -n webapps
-          kubectl get svc -n webapps
-
+          
       - name: Run kubeaudit
         run: |
           ./kubeaudit all -kubeconfig <(echo ${{ secrets.KUBE_CONFIG }} | base64 -d) > kubeaudit-report.txt
@@ -37,3 +32,10 @@ jobs:
         with:
           name: kubeaudit-report
           path: kubeaudit-report.txt
+
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl apply -f deployment-service.yaml -n webapps
+          kubectl get svc -n webapps
+
+   
