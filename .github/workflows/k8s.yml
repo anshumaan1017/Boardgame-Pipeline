@@ -8,10 +8,25 @@ on:
 jobs:
   kubernetes-deploy:
     runs-on: ubuntu-latest
-    permissions: write-all
+    permissions:
+      contents: write
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+
+      - name: Set up Kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      - name: Verify kubeconfig
+        run: |
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
+          cat $HOME/.kube/config
+
+      - name: Test Kubernetes connectivity
+        run: kubectl cluster-info
 
       - name: Download kubeaudit
         run: |
@@ -19,15 +34,8 @@ jobs:
           tar -xzf kubeaudit.tar.gz
           chmod +x kubeaudit
 
-      - name: Set up Kubectl
-        uses: tale/kubectl-action@v1
-        with:
-          base64-kube-config: ${{ secrets.KUBE_CONFIG }}
-
       - name: Run kubeaudit
-        run: |
-          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > kubeconfig
-          ./kubeaudit all  > kubeaudit-report.txt
+        run: ./kubeaudit all -kubeconfig $HOME/.kube/config > kubeaudit-report.txt
 
       - name: Upload kubeaudit results
         uses: actions/upload-artifact@v3
