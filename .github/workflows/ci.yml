@@ -175,7 +175,7 @@ jobs:
 
   Software-Bill-of-Material-SBOM:
     runs-on: ubuntu-latest
-     permissions:
+    permissions:
       contents: read
       id-token: write
       packages: write
