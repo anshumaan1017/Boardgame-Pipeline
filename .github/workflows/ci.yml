@@ -68,7 +68,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: anshumaan-10/Boardgame-Pipeline
-          token: ${{ secrets.GITHUB_TOKEN }}  # Ensure you use the correct secret for GitHub authentication
+          token: ${{ secrets.TOKEN_GITHUB }}  # Ensure you use the correct secret for GitHub authentication
           ssh-strict: true
           persist-credentials: true
           clean: true
