@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      id-token: write
+      id-token: write 
       packages: write
       security-events: write
       statuses: write
@@ -22,10 +22,6 @@ jobs:
         uses: tale/kubectl-action@v1
         with:
           base64-kube-config: ${{ secrets.KUBE_CONFIG }}
-
-      - name: Test kubectl configuration
-        run: |
-          kubectl get pods --namespace webapps
 
       - run: |
           kubectl apply -f deployment-service.yaml -n webapps
