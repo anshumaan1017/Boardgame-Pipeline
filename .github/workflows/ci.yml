@@ -21,21 +21,21 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      # - name: Perform ShiftLeft Scan
-      #   uses: ShiftLeftSecurity/scan-action@master
-      #   with:
-      #     type: "java,javascript,credscan,depscan,python,html,go,jsp,node.js,bash"
-      #   env:
-      #     WORKSPACE: https://github.com/${{ github.repository }}/blob/${{ github.sha }}
-      #     GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
-      #     SCAN_AUTO_BUILD: true
+      - name: Perform ShiftLeft Scan
+        uses: ShiftLeftSecurity/scan-action@master
+        with:
+          type: "java,javascript,credscan,depscan,python,html,go,jsp,node.js,bash"
+        env:
+          WORKSPACE: https://github.com/${{ github.repository }}/blob/${{ github.sha }}
+          GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
+          SCAN_AUTO_BUILD: true
 
-      # - name: Upload ShiftLeft SAST reports
-      #   if: always()
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: shiftleft-sast-reports
-      #     path: shiftleft
+      - name: Upload ShiftLeft SAST reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: shiftleft-sast-reports
+          path: shiftleft
 
       - name: Run Semgrep scan
         run: |
@@ -181,7 +181,23 @@ jobs:
          with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-  
+
+
+       - name: Docker Scout for Image Scan
+         uses: docker/scout-action@v1
+         with:
+            image: anshumaan10/boardgame:latest
+            ignore-unchanged: true
+            write-comment: true
+            github-token: ${{ secrets.TOKEN_GITHUB }} # to be able to write the comment
+            continue-on-error: true
+            
+
+       - name: Upload Scout Report Artifact
+         uses: actions/upload-artifact@v3
+         with:
+            name: scout-report
+            path: scout-report.json
       # Push Docker image
        - name: Push Docker Image
          run: |
@@ -288,6 +304,8 @@ jobs:
         with:
           name: trivy-fs-report 
           path: trivy-fs-report.html
+
+
 
   kubernetes-deploy:
     runs-on: ubuntu-latest
