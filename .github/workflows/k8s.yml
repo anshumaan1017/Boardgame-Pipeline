@@ -23,9 +23,16 @@ jobs:
         with:
           base64-kube-config: ${{ secrets.KUBE_CONFIG }}
 
-      - run: |
-          kubectl apply -f deployment-service.yaml -n webapps
-          kubectl get svc -n webapps
+      - name: Deploy to Kubernetes
+        run: |
+          retries=5
+          until kubectl apply -f deployment-service.yaml -n webapps --validate=false || [ $retries -le 0 ]; do
+            echo "Retrying... $((retries--)) left"
+            sleep 5
+          done
 
+      - name: Get Services
+        run: |
+          kubectl get svc -n webapps
 
     
