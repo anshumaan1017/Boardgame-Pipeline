@@ -2,9 +2,6 @@ name: Kubernetes-Deploy-and-Audit
 
 on:
   workflow_dispatch
-  # push:
-  #   branches:
-  #     - main
 
 jobs:
   kubernetes-deploy:
@@ -25,16 +22,22 @@ jobs:
         with:
           version: 'latest'
 
+      - name: Set up kubeconfig
+        run: |
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 --decode > $HOME/.kube/config
+
       - name: Download kubeaudit
         run: |
           curl -L -o kubeaudit.tar.gz https://github.com/Shopify/kubeaudit/releases/download/v0.22.1/kubeaudit_0.22.1_linux_amd64.tar.gz
           tar -xzf kubeaudit.tar.gz
           chmod +x kubeaudit
+          sudo mv kubeaudit /usr/local/bin/
 
-      - name: Kubectl Action
-        uses: tale/kubectl-action@v1
-        with:
-          base64-kube-config: ${{ secrets.KUBE_CONFIG }}
-      - run: |
-            kubectl apply -f deployment-service.yaml -n webapps
-            kubectl get svc -n webapps
+      - name: Apply Kubernetes manifest
+        run: |
+          kubectl apply -f deployment-service.yaml -n webapps
+          kubectl get svc -n webapps
+
+      - name: Run kubeaudit
+        run: |
+          kubeaudit --kubeconfig=$HOME/.kube/config
