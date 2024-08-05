@@ -23,6 +23,18 @@ jobs:
         with:
           base64-kube-config: ${{ secrets.KUBE_CONFIG }}
 
+      - name: Set up Google Cloud SDK
+        run: |
+          curl -sO https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-390.0.0-linux-x86_64.tar.gz
+          tar -zxvf google-cloud-sdk-390.0.0-linux-x86_64.tar.gz
+          ./google-cloud-sdk/install.sh -q
+          source ./google-cloud-sdk/path.bash.inc
+
+      - name: Install gke-gcloud-auth-plugin
+        run: |
+          gcloud components install gke-gcloud-auth-plugin
+
+
       - name: 'Set up Cloud SDK'
         uses: 'google-github-actions/setup-gcloud@v2'
         with:
