@@ -23,6 +23,18 @@ jobs:
       - name: Make Insider executable
         run: chmod +x insider
 
-      - name: Run Insider Security Scan
-        run: ./insider --tech javascript --target ./src
+      - name: Run Insider Security Scan on src directory
+        run: |
+          ./insider -tech java -target ./src -exclude node_modules/* -exclude tests/* -v 
 
+      - name: Upload HTML Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: insider-html-report
+          path: ./insider-report.html
+
+      - name: Upload JSON Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: insider-json-report
+          path: ./insider-report.json
