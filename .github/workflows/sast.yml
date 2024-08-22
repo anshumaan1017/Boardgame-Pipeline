@@ -78,12 +78,12 @@ jobs:
       - name: Run Insider Security Analysis
         uses: insidersec/insider-action@v0
         with:
-          technology: java
+          technology: java # Replace with the correct technology
           target: src
           security: 80
-          noHtml: false  # Set to false to generate the HTML report
-          noJson: false  # Set to false to generate the JSON report
-          noBanner: true # Set to true to skip the banner printing
+          noHtml: true  # Skips HTML report generation
+          noJson: true  # Skips JSON report generation
+          # Removed the noBanner flag as it caused the error
 
       - name: Upload HTML Report
         if: always()
