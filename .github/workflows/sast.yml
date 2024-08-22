@@ -60,23 +60,41 @@
 #           path: path/to/generated/shiftleft/reports
 
 
-name: insider
+name: Insider Security Analysis
+
 on:
   pull_request:
   push:
+
 jobs:
   insider:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout Source Code
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
 
-      - name: Run Insider
+      - name: Run Insider Security Analysis
         uses: insidersec/insider-action@v0
         with:
-            technology: java
-            # Relative path under $GITHUB_WORKSPACE to use as a target
-            # In this example, will use $GITHUB_WORKSPACE/src as a target
-            target: src
+          technology: java
+          target: src
+          security: 80
+          noHtml: false  # Set to false to generate the HTML report
+          noJson: false  # Set to false to generate the JSON report
+          noBanner: true # Set to true to skip the banner printing
+
+      - name: Upload HTML Report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: insider-html-report
+          path: src/insider_report.html  # Replace with the actual path if different
+
+      - name: Upload JSON Report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: insider-json-report
+          path: src/insider_report.json  # Replace with the actual path if different
