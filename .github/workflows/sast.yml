@@ -80,9 +80,9 @@ jobs:
         with:
           technology: java # Replace with the correct technology
           target: src
-          noHtml: true  # Skips HTML report generation
-          noJson: true  # Skips JSON report generation
-          # Removed the noBanner flag as it caused the error
+          # noHtml: true  # Skips HTML report generation
+          # noJson: true  # Skips JSON report generation
+          # # Removed the noBanner flag as it caused the error
 
       - name: Upload HTML Report
         if: always()
