@@ -1,0 +1,28 @@
+name: Insider Security Scan
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  insider-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Download Insider tool
+        run: wget https://github.com/insidersec/insider/releases/download/2.1.0/insider_2.1.0_linux_x86_64.tar.gz
+
+      - name: Extract Insider tool
+        run: tar -xf insider_2.1.0_linux_x86_64.tar.gz
+
+      - name: Make Insider executable
+        run: chmod +x insider
+
+      - name: Run Insider Security Scan
+        run: ./insider --tech javascript --target ./src
+
