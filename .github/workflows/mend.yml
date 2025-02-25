@@ -1,16 +1,3 @@
-# ******** Mend Unified CLI Template for Github Actions ********
-#
-# You may wish to alter this file to override the build tool and Mend scanning technologies.
-#
-# For more configuration options, please check the technical documentation portal:
-# 📚 https://docs.mend.io/bundle/integrations/page/scan_with_the_mend_cli.html
-#
-# ******** Description ********
-# mend dep will automatically use package managers and file system scanning to detect open source components.
-# mend code will automatically detect languages and frameworks used in your projects to scan for code weaknesses.
-
-# If you are NOT using a service user, and have multiple organizations, don't forget to call the scope -s parameter to set the organization
-
 name: Mend CLI Scan
 
 on:
@@ -18,30 +5,49 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  mend_scan:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-## Maven example - replace with your build steps
-#    - name: Set up JDK
-#      uses: actions/setup-java@v2
-#      with:
-#        java-version: '11'
-#        distribution: 'adopt'
-#    - name: Build with Maven
-#      run: mvn clean install -DskipTests=true
-##
-# The mend dep scan should be called AFTER a package manager build step such as "mvn clean install -DskipTests=true" or "npm install --only=prod"
-    - name: Mend CLI Scan
-      env:
-        MEND_EMAIL: ${{secrets.MEND_EMAIL}}
-        MEND_USER_KEY: ${{secrets.MEND_USER_KEY}}
-        MEND_URL: https://saas.whitesourcesoftware.com
-      run: |
-        echo Downloading Mend CLI
-        curl https://downloads.mend.io/cli/linux_amd64/mend -o /usr/local/bin/mend && chmod +x /usr/local/bin/mend
-        echo run Mend dependencies scan
-        mend dep -u
-        echo Run Mend code scan
-        mend code
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up environment variables
+        env:
+          MEND_EMAIL: ${{ secrets.MEND_EMAIL }}
+          MEND_USER_KEY: ${{ secrets.MEND_USER_KEY }}
+          MEND_URL: https://saas.whitesourcesoftware.com
+        run: echo "Environment variables set"
+
+      - name: Download Mend CLI
+        run: |
+          echo "Downloading Mend CLI"
+          curl -sSL https://downloads.mend.io/cli/linux_amd64/mend -o /usr/local/bin/mend
+          chmod +x /usr/local/bin/mend
+
+      - name: Run Mend dependencies scan
+        run: mend dep -u --format sarif --filename mend-dep-results.sarif
+
+      - name: Run Mend code scan
+        run: mend code --format sarif --filename mend-code-results.sarif
+
+      # - name: Run Mend image scan
+      #   env:
+      #     DOCKER_REPO_NAME: your-docker-repo
+      #     DOCKER_TAG: your-docker-tag
+      #   run: mend image $DOCKER_REPO_NAME:$DOCKER_TAG --format sarif --filename mend-image-results.sarif --local-pull
+
+      - name: Upload SARIF results for dependency scan
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: mend-dep-results.sarif
+
+      - name: Upload SARIF results for code scan
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: mend-code-results.sarif
+
+      # - name: Upload SARIF results for image scan
+      #   uses: github/codeql-action/upload-sarif@v3
+      #   with:
+      #     sarif_file: mend-image-results.sarif
