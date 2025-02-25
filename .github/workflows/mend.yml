@@ -42,6 +42,16 @@ jobs:
         echo Downloading Mend CLI
         curl https://downloads.mend.io/cli/linux_amd64/mend -o /usr/local/bin/mend && chmod +x /usr/local/bin/mend
         echo run Mend dependencies scan
-        mend dep -u
+        mend dep -u --format sarif --filename mend-dep-results.sarif
         echo Run Mend code scan
-        mend code
+        mend code --format sarif --filename mend-code-results.sarif
+
+    - name: Upload SARIF results for dependency scan
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: mend-dep-results.sarif
+
+    - name: Upload SARIF results for code scan
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: mend-code-results.sarif
