@@ -24,12 +24,10 @@ jobs:
           echo "Downloading Mend CLI"
           curl -sSL https://downloads.mend.io/cli/linux_amd64/mend -o /usr/local/bin/mend
           chmod +x /usr/local/bin/mend
-
-      - name: Run Mend dependencies scan
-        run: mend dep -u --format sarif --filename mend-dep-results.sarif
-
-      - name: Run Mend code scan
-        run: mend code --format sarif --filename mend-code-results.sarif
+          echo "Run Mend dependencies scan"
+          mend dep -u --format sarif --filename mend-dep-results.sarif
+          echo "Run Mend code scan"
+          mend code --format sarif --filename mend-code-results.sarif
 
       # - name: Run Mend image scan
       #   env:
