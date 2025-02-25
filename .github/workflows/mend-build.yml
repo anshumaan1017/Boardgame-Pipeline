@@ -54,13 +54,9 @@ jobs:
         MEND_URL: https://saas.whitesourcesoftware.com
       run: |
         echo "Running Mend Image Scan"
-        mend image anshumaan10/boardgame:latest --format json --filename mend-image-scan.json --local-pull
-
-    - name: Convert Mend JSON to SARIF
-      run: python convert_mend_json_to_sarif.py mend-image-scan.json mend-image-scan.sarif
-
-    - name: Upload Mend SARIF results
+        mend image anshumaan10/boardgame:latest --format sarif --filename results.sarif --local-pull
+      
+    - name: Upload sarif
       uses: github/codeql-action/upload-sarif@v3
       with:
-        sarif_file: mend-image-scan.sarif
-
+        sarif_file: results.sarif
