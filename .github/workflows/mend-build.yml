@@ -51,6 +51,9 @@ jobs:
         MEND_USER_KEY: ${{ secrets.MEND_USER_KEY }}
         MEND_URL: https://saas.whitesourcesoftware.com
       run: |
+        echo "Downloading Mend CLI"
+        curl -sSL https://downloads.mend.io/cli/linux_amd64/mend -o /usr/local/bin/mend
+        chmod +x /usr/local/bin/mend
         echo "Running Mend Image Scan"
         mend image anshumaan10/boardgame:latest --format sarif --filename results.sarif --local-pull
       
